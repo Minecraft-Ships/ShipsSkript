@@ -1,0 +1,5 @@
+name: SkriptShips
+version: 1.0
+main: org.ships.skript.ShipsSkript
+api-version: 1.13
+depend: [Skript, Ships]
