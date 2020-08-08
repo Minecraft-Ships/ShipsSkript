@@ -10,40 +10,34 @@ import ch.njol.skript.lang.SkriptParser;
 import ch.njol.skript.lang.util.SimpleExpression;
 import ch.njol.util.Kleenean;
 import org.bukkit.event.Event;
-import org.core.utils.Identifable;
 import org.ships.exceptions.load.LoadVesselException;
 import org.ships.vessel.common.loader.ShipsIDFinder;
 import org.ships.vessel.common.types.Vessel;
 
-
-@Name("Ships - Id of Ship")
-@Description("Returns the id of the ship")
-@Examples({"send \"%identification of %ship%%\""})
-public class ExprShipsId extends SimpleExpression<String> {
+@Name("Ships - get ship type")
+@Description("Gets the id of the ship type from the provided ship")
+@Examples({"send \"ship type of ship\""})
+public class ExprShipsType extends SimpleExpression<String> {
 
     static {
-            Skript.registerExpression(ExprShipsId.class, String.class, ExpressionType.COMBINED, "[get] [the] [Ships] (identification | id) of %string%");
+        Skript.registerExpression(ExprShipsType.class, String.class, ExpressionType.COMBINED, "[get] [the] [Ships] (ship type | shiptype) of %string%");
     }
 
-    private Expression<String> vesselId;
+    private Expression<String> vessel;
 
     @Override
     protected String[] get(Event event) {
-        String vesselId = this.vesselId.getSingle(event);
-        if(vesselId == null){
+        String shipsId = this.vessel.getSingle(event);
+        if(shipsId == null){
             return null;
         }
         Vessel vessel;
         try {
-            vessel = new ShipsIDFinder(vesselId).load();
+            vessel = new ShipsIDFinder(shipsId).load();
         } catch (LoadVesselException e) {
             return null;
         }
-        if(!(vessel instanceof Identifable)){
-            return null;
-        }
-        Identifable identifable = (Identifable) vessel;
-        return new String[]{identifable.getId()};
+        return new String[]{vessel.getType().getId()};
     }
 
     @Override
@@ -58,12 +52,11 @@ public class ExprShipsId extends SimpleExpression<String> {
 
     @Override
     public String toString(Event event, boolean b) {
-        return this.vesselId.toString(event, b);
+        return "The type of ship that is " + this.vessel.toString(event, b);
     }
 
     @Override
     public boolean init(Expression<?>[] expressions, int i, Kleenean kleenean, SkriptParser.ParseResult parseResult) {
-        this.vesselId = (Expression<String>) expressions[0];
         return true;
     }
 }

@@ -9,7 +9,7 @@ import ch.njol.skript.lang.ExpressionType;
 import ch.njol.skript.lang.SkriptParser;
 import ch.njol.skript.lang.util.SimpleExpression;
 import ch.njol.util.Kleenean;
-import org.bukkit.block.Block;
+import org.bukkit.Location;
 import org.bukkit.event.Event;
 import org.core.utils.Identifable;
 import org.core.world.position.impl.sync.SyncBlockPosition;
@@ -18,23 +18,23 @@ import org.ships.implementation.bukkit.world.position.impl.sync.BBlockPosition;
 import org.ships.vessel.common.loader.ShipsBlockFinder;
 import org.ships.vessel.common.types.Vessel;
 
-@Name("Ships - Ship at Block")
-@Description("Returns the ship at Block")
-@Examples({"send \"%get the ship at Block%\""})
-public class ExprVesselFinderByBlock extends SimpleExpression<String> {
+@Name("Ships - Ship at Location")
+@Description("Returns the ship at location")
+@Examples({"send \"%get the ship at location%\""})
+public class ExprVesselFinderByLocation extends SimpleExpression<String> {
 
     static {
-        Skript.registerExpression(ExprVesselFinderByBlock.class, String.class, ExpressionType.COMBINED, "[get] [the] [Ships] ship at %block%");
+        Skript.registerExpression(ExprVesselFinderByLocation.class, String.class, ExpressionType.COMBINED, "[get] [the] [Ships] ship at %location%");
     }
 
-    private Expression<Block> block;
+    private Expression<Location> location;
 
     protected String[] get(Event event) {
-        Block block = this.block.getSingle(event);
-        if(block == null){
+        Location location = this.location.getSingle(event);
+        if(location == null){
             return null;
         }
-        SyncBlockPosition position = new BBlockPosition(block);
+        SyncBlockPosition position = new BBlockPosition(location.getBlock());
         try {
             Vessel vessel = new ShipsBlockFinder(position).load();
             if(vessel instanceof Identifable){
@@ -55,11 +55,11 @@ public class ExprVesselFinderByBlock extends SimpleExpression<String> {
     }
 
     public String toString(Event event, boolean b) {
-        return "Ship at block " + this.block.toString(event, b);
+        return "Ship at location " + location.toString(event, b);
     }
 
     public boolean init(Expression<?>[] expressions, int i, Kleenean kleenean, SkriptParser.ParseResult parseResult) {
-        this.block = (Expression<Block>) expressions[0];
+        this.location = (Expression<Location>) expressions[0];
         return true;
     }
 }
