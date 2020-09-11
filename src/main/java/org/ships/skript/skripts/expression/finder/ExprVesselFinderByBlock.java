@@ -11,25 +11,25 @@ import ch.njol.skript.lang.util.SimpleExpression;
 import ch.njol.util.Kleenean;
 import org.bukkit.block.Block;
 import org.bukkit.event.Event;
-import org.core.utils.Identifable;
 import org.core.world.position.impl.sync.SyncBlockPosition;
 import org.ships.exceptions.load.LoadVesselException;
 import org.ships.implementation.bukkit.world.position.impl.sync.BBlockPosition;
 import org.ships.vessel.common.loader.ShipsBlockFinder;
 import org.ships.vessel.common.types.Vessel;
+import org.ships.vessel.common.types.typical.ShipsVessel;
 
 @Name("Ships - Ship at Block")
 @Description("Returns the ship at Block")
 @Examples({"send \"%get the ship at Block%\""})
-public class ExprVesselFinderByBlock extends SimpleExpression<String> {
+public class ExprVesselFinderByBlock extends SimpleExpression<ShipsVessel> {
 
     static {
-        Skript.registerExpression(ExprVesselFinderByBlock.class, String.class, ExpressionType.COMBINED, "[get] [the] [Ships] ship at %block%");
+        Skript.registerExpression(ExprVesselFinderByBlock.class, ShipsVessel.class, ExpressionType.COMBINED, "[get] [the] [Ships] ship at %block%");
     }
 
     private Expression<Block> block;
 
-    protected String[] get(Event event) {
+    protected ShipsVessel[] get(Event event) {
         Block block = this.block.getSingle(event);
         if(block == null){
             return null;
@@ -37,10 +37,10 @@ public class ExprVesselFinderByBlock extends SimpleExpression<String> {
         SyncBlockPosition position = new BBlockPosition(block);
         try {
             Vessel vessel = new ShipsBlockFinder(position).load();
-            if(vessel instanceof Identifable){
-                return new String[]{((Identifable) vessel).getId()};
+            if(vessel instanceof ShipsVessel){
+                return new ShipsVessel[]{(ShipsVessel) vessel};
             }
-            return new String[] {vessel.getName()};
+            return null;
         } catch (LoadVesselException e) {
         }
         return null;
@@ -50,8 +50,8 @@ public class ExprVesselFinderByBlock extends SimpleExpression<String> {
         return true;
     }
 
-    public Class<? extends String> getReturnType() {
-        return String.class;
+    public Class<? extends ShipsVessel> getReturnType() {
+        return ShipsVessel.class;
     }
 
     public String toString(Event event, boolean b) {

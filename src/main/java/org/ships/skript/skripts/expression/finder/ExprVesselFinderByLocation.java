@@ -10,37 +10,39 @@ import ch.njol.skript.lang.SkriptParser;
 import ch.njol.skript.lang.util.SimpleExpression;
 import ch.njol.util.Kleenean;
 import org.bukkit.Location;
+import org.bukkit.block.Block;
 import org.bukkit.event.Event;
-import org.core.utils.Identifable;
 import org.core.world.position.impl.sync.SyncBlockPosition;
 import org.ships.exceptions.load.LoadVesselException;
 import org.ships.implementation.bukkit.world.position.impl.sync.BBlockPosition;
 import org.ships.vessel.common.loader.ShipsBlockFinder;
 import org.ships.vessel.common.types.Vessel;
+import org.ships.vessel.common.types.typical.ShipsVessel;
 
-@Name("Ships - Ship at Location")
-@Description("Returns the ship at location")
-@Examples({"send \"%get the ship at location%\""})
-public class ExprVesselFinderByLocation extends SimpleExpression<String> {
+@Name("Ships - Ship at Block")
+@Description("Returns the ship at Block")
+@Examples({"send \"%get the ship at Block%\""})
+public class ExprVesselFinderByLocation extends SimpleExpression<ShipsVessel> {
 
     static {
-        Skript.registerExpression(ExprVesselFinderByLocation.class, String.class, ExpressionType.COMBINED, "[get] [the] [Ships] ship at %location%");
+        Skript.registerExpression(ExprVesselFinderByLocation.class, ShipsVessel.class, ExpressionType.COMBINED, "[get] [the] [Ships] ship at %location%");
     }
 
-    private Expression<Location> location;
+    private Expression<Location> block;
 
-    protected String[] get(Event event) {
-        Location location = this.location.getSingle(event);
-        if(location == null){
+    protected ShipsVessel[] get(Event event) {
+        Location loc = this.block.getSingle(event);
+        System.out.println("Get Location: " + loc);
+        if(loc == null){
             return null;
         }
-        SyncBlockPosition position = new BBlockPosition(location.getBlock());
+        SyncBlockPosition position = new BBlockPosition(loc.getBlock());
         try {
             Vessel vessel = new ShipsBlockFinder(position).load();
-            if(vessel instanceof Identifable){
-                return new String[]{((Identifable) vessel).getId()};
+            if(vessel instanceof ShipsVessel){
+                return new ShipsVessel[]{(ShipsVessel) vessel};
             }
-            return new String[] {vessel.getName()};
+            return null;
         } catch (LoadVesselException e) {
         }
         return null;
@@ -50,16 +52,16 @@ public class ExprVesselFinderByLocation extends SimpleExpression<String> {
         return true;
     }
 
-    public Class<? extends String> getReturnType() {
-        return String.class;
+    public Class<? extends ShipsVessel> getReturnType() {
+        return ShipsVessel.class;
     }
 
     public String toString(Event event, boolean b) {
-        return "Ship at location " + location.toString(event, b);
+        return "Ship at location " + this.block.toString(event, b);
     }
 
     public boolean init(Expression<?>[] expressions, int i, Kleenean kleenean, SkriptParser.ParseResult parseResult) {
-        this.location = (Expression<Location>) expressions[0];
+        this.block = (Expression<Location>) expressions[0];
         return true;
     }
 }

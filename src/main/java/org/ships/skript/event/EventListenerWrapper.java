@@ -5,21 +5,27 @@ import org.core.event.EventListener;
 import org.core.event.HEvent;
 import org.ships.event.vessel.VesselStructureUpdate;
 import org.ships.event.vessel.create.VesselCreateEvent;
+import org.ships.event.vessel.move.VesselMoveEvent;
 
 public class EventListenerWrapper implements EventListener {
 
     @HEvent
-    public void OnPreSignCreateVesselEvent(VesselCreateEvent.Pre.BySign event){
+    public void onPreMoveVesselEvent(VesselMoveEvent.Pre event){
+        Bukkit.getPluginManager().callEvent(new EventWrapper.VesselMovePreWrapper(event));
+    }
+
+    @HEvent
+    public void onPreSignCreateVesselEvent(VesselCreateEvent.Pre.BySign event){
         Bukkit.getPluginManager().callEvent(new EventWrapper.VesselCreatePreBySignWrapper(event));
     }
 
     @HEvent
-    public void OnPostSignCreateVesselEvent(VesselCreateEvent.Post.BySign event){
+    public void onPostSignCreateVesselEvent(VesselCreateEvent.Post.BySign event){
         Bukkit.getPluginManager().callEvent(new EventWrapper.VesselCreatePostBySignWrapper(event));
     }
 
     @HEvent
-    public void OnVesselStructureUpdate(VesselStructureUpdate event){
+    public void onVesselStructureUpdate(VesselStructureUpdate event){
         Bukkit.getPluginManager().callEvent(new EventWrapper.VesselStructureUpdateWrapper(event));
     }
 }

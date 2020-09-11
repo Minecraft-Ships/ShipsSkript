@@ -11,10 +11,8 @@ import ch.njol.skript.lang.util.SimpleExpression;
 import ch.njol.util.Kleenean;
 import org.bukkit.block.Block;
 import org.bukkit.event.Event;
-import org.ships.exceptions.load.LoadVesselException;
 import org.ships.implementation.bukkit.world.position.impl.sync.BBlockPosition;
-import org.ships.vessel.common.loader.ShipsIDFinder;
-import org.ships.vessel.common.types.Vessel;
+import org.ships.vessel.common.types.typical.ShipsVessel;
 
 @Name("Ships - ships location")
 @Description("Gets the location of the ship")
@@ -22,21 +20,15 @@ import org.ships.vessel.common.types.Vessel;
 public class ExprShipsPosition extends SimpleExpression<Block> {
 
     static {
-        Skript.registerExpression(ExprShipsPosition.class, Block.class, ExpressionType.COMBINED, "[get] [the] [Ships] (position | location) of %string%");
+        Skript.registerExpression(ExprShipsPosition.class, Block.class, ExpressionType.COMBINED, "[get] [the] [Ships] (position | location) of %vessel%");
     }
 
-    private Expression<String> vessel;
+    private Expression<ShipsVessel> vessel;
 
     @Override
     protected Block[] get(Event event) {
-        String shipsId = this.vessel.getSingle(event);
-        if(shipsId == null){
-            return null;
-        }
-        Vessel vessel;
-        try {
-            vessel = new ShipsIDFinder(shipsId).load();
-        } catch (LoadVesselException e) {
+        ShipsVessel vessel = this.vessel.getSingle(event);
+        if(vessel == null){
             return null;
         }
         return new Block[]{((BBlockPosition)vessel.getPosition()).getBukkitBlock()};
@@ -59,7 +51,7 @@ public class ExprShipsPosition extends SimpleExpression<Block> {
 
     @Override
     public boolean init(Expression<?>[] expressions, int i, Kleenean kleenean, SkriptParser.ParseResult parseResult) {
-        this.vessel = (Expression<String>) expressions[0];
+        this.vessel = (Expression<ShipsVessel>) expressions[0];
         return true;
     }
 }
