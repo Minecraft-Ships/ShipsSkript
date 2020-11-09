@@ -35,7 +35,7 @@ public class ExprNewStructureContext extends SimpleExpression<Block> {
             return null;
         }
         Set<Block> set = new HashSet<>();
-        context.getMovingStructure().forEach(m -> m.getAfterPosition().ifPresent(move -> set.add(((BBlockPosition)move).getBukkitBlock())));
+        context.getMovingStructure().forEach(m -> set.add(((BBlockPosition)m).getBukkitBlock()));
         return set.toArray(new Block[0]);
     }
 
