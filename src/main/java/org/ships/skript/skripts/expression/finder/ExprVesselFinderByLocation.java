@@ -32,7 +32,6 @@ public class ExprVesselFinderByLocation extends SimpleExpression<ShipsVessel> {
 
     protected ShipsVessel[] get(Event event) {
         Location loc = this.block.getSingle(event);
-        System.out.println("Get Location: " + loc);
         if(loc == null){
             return null;
         }
